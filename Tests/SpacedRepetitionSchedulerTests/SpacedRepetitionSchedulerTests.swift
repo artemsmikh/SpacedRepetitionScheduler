@@ -20,7 +20,7 @@ final class SpacedRepetitionSchedulerTests: XCTestCase {
     }
 
     XCTAssertEqual(results[.again]?.mode, .learning(step: 0))
-    XCTAssertEqual(results[.again]?.interval, schedulingParameters.learningIntervals[0])
+    XCTAssertEqual(results[.again]?.interval, schedulingParameters.returnToLearningInterval)
 
     // Cards that were "easy" immediately leave the learning state.
     XCTAssertEqual(results[.easy]?.mode, .review)
@@ -28,12 +28,12 @@ final class SpacedRepetitionSchedulerTests: XCTestCase {
 
     // Cards that were "good" move to the next state.
     XCTAssertEqual(results[.good]?.mode, .learning(step: 1))
-    XCTAssertEqual(results[.good]?.interval, schedulingParameters.learningIntervals[1])
+    XCTAssertEqual(results[.good]?.interval, schedulingParameters.learningIntervals[0])
   }
 
   func testScheduleReadyToGraduateCard() {
     let readyToGraduateItem = PromptSchedulingMetadata(
-      mode: .learning(step: schedulingParameters.learningIntervals.count - 1)
+      mode: .learning(step: schedulingParameters.learningIntervals.count)
     )
     let results = readyToGraduateItem.allPossibleUpdates(with: schedulingParameters)
 
@@ -45,7 +45,7 @@ final class SpacedRepetitionSchedulerTests: XCTestCase {
     }
 
     XCTAssertEqual(results[.again]?.mode, .learning(step: 0))
-    XCTAssertEqual(results[.again]?.interval, schedulingParameters.learningIntervals[0])
+    XCTAssertEqual(results[.again]?.interval, schedulingParameters.returnToLearningInterval)
 
     // Cards that were "easy" immediately leave the learning state.
     XCTAssertEqual(results[.easy]?.mode, .review)
@@ -59,7 +59,7 @@ final class SpacedRepetitionSchedulerTests: XCTestCase {
   func testProgressFromNewToReview() throws {
     var item = PromptSchedulingMetadata()
 
-    for _ in 0 ..< schedulingParameters.learningIntervals.count {
+    for _ in 0 ... schedulingParameters.learningIntervals.count {
       // Answer the item as "good"
       try item.update(with: schedulingParameters, recallEase: .good, timeIntervalSincePriorReview: 0)
     }
@@ -76,7 +76,7 @@ final class SpacedRepetitionSchedulerTests: XCTestCase {
     let delay: TimeInterval = .day
     let results = reviewItem.allPossibleUpdates(with: schedulingParameters, timeIntervalSincePriorReview: delay)
     XCTAssertEqual(results[.again]?.lapseCount, 1)
-    XCTAssertEqual(results[.again]?.interval, schedulingParameters.learningIntervals.first)
+    XCTAssertEqual(results[.again]?.interval, schedulingParameters.returnToLearningInterval)
     XCTAssertEqual(results[.again]?.mode, .learning(step: 0))
     XCTAssertEqual(results[.again]!.reviewSpacingFactor, 2.3, accuracy: 0.01)
 

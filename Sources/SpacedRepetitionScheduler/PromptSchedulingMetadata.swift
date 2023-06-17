@@ -63,8 +63,8 @@ public struct PromptSchedulingMetadata: Hashable {
       throw SchedulingError.noHardRecallForLearningItems
     case (.learning(let step), .good):
       // Move to the next step.
-      if step < (schedulingParameters.learningIntervals.count - 1) {
-        interval = schedulingParameters.learningIntervals[step + 1]
+      if step < schedulingParameters.learningIntervals.count {
+        interval = schedulingParameters.learningIntervals[step]
         mode = .learning(step: step + 1)
       } else {
         // Graduate to "review"
@@ -129,6 +129,6 @@ public struct PromptSchedulingMetadata: Hashable {
   private mutating func moveToFirstStep(schedulingParameters: SchedulingParameters) {
     // Go back to the initial learning step, schedule out a tiny bit.
     mode = .learning(step: 0)
-    interval = schedulingParameters.learningIntervals.first ?? .minute
+    interval = schedulingParameters.returnToLearningInterval
   }
 }

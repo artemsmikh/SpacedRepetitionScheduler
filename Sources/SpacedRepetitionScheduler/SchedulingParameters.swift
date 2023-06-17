@@ -14,16 +14,19 @@ public struct SchedulingParameters {
   /// - parameter learningIntervals: The time intervals between successive successful recalls of a prompt in *learning* mode. The number of items in this array determines how many times a learner must successfully recall a prompt for it to graduate to the *review* mode.
   /// - parameter easyGraduatingInterval: The ideal interval for reviewing a prompt again after it graduates from *learning* to *review* with a recall ease of *easy*.
   /// - parameter goodGraduatingInterval: The ideal interval for reviewing a prompt again after it graduates from *learning* to *review* with a recall ease of *good*.
+  /// - parameter returnToLearningInterval: The ideal interval for reviewing a prompt again after it moves back to *learning* after a recall ease of *again*.
   /// - parameter easyBoost: An additional mutiplicative factor for the scheduling interval when a prompt is in *review* mode and its recall ease is *easy*.
   public init(
     learningIntervals: [TimeInterval],
     easyGraduatingInterval: TimeInterval = 4 * .day,
     goodGraduatingInterval: TimeInterval = 1 * .day,
+    returnToLearningInterval: TimeInterval = .minute,
     easyBoost: Double = 1.3
   ) {
     self.learningIntervals = learningIntervals
     self.easyGraduatingInterval = easyGraduatingInterval
     self.goodGraduatingInterval = goodGraduatingInterval
+    self.returnToLearningInterval = returnToLearningInterval
     self.easyBoost = easyBoost
   }
 
@@ -35,6 +38,9 @@ public struct SchedulingParameters {
 
   /// The ideal interval for reviewing a prompt again after it graduates from *learning* to *review* with a recall ease of *good*.
   public let goodGraduatingInterval: TimeInterval
+    
+  /// The ideal interval for reviewing a prompt again after it moves back to *learning* after a recall ease of *again*.
+  public let returnToLearningInterval: TimeInterval
 
   /// An additional mutiplicative factor for the scheduling interval when a prompt is in *review* mode and its recall ease is *easy*.
   public let easyBoost: Double
